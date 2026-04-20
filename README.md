@@ -6,6 +6,10 @@ Velosite is an **AI-powered website builder** that converts natural language pro
 
 ---
 
+⭐ Support
+
+If you like this project, consider giving it a ⭐ on GitHub!
+
 ## ✨ Features  
 
 - 🧠 AI-based code generation  
@@ -31,7 +35,6 @@ Velosite is an **AI-powered website builder** that converts natural language pro
 - CrewAI (multi-agent architecture)  
 - LLM-based structured generation  
 
-## 📁 Project Structure
 ## 📁 Project Structure
 
 ```
@@ -96,7 +99,3 @@ Velosite uses a multi-agent pipeline:
 🌐 Full-stack generation (backend + database)
 🧩 Component-level editing
 📦 Export as deployable project
-
-⭐ Support
-
-If you like this project, consider giving it a ⭐ on GitHub!
