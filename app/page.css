@@ -207,14 +207,97 @@ body {
         }
 
         /* Shimmer on loading button */
-        .generate-btn.loading::after {
+.generate-btn.loading::after {
           content: '';
           position: absolute;
           top:0; left:0; right:0; bottom:0;
           background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 50%, transparent 100%);
           background-size: 400px 100%;
           animation: shimmer 1.4s linear infinite;
-        }
+}
+
+.github-panel {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.github-btn,
+.github-link-btn {
+  background: linear-gradient(135deg, #1f6feb, #0d4db8);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.github-link-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.github-btn:disabled,
+.github-link-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.github-user-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.github-user-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  color: #e2e2e2;
+  flex: 1;
+}
+
+.github-user-meta a {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 11px;
+}
+
+.github-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+}
+
+.github-input {
+  width: 100%;
+  background: rgba(20, 20, 20, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 9px 10px;
+  color: #e2e2e2;
+  font-size: 12px;
+}
+
+.github-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.github-status {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.4;
+  word-break: break-word;
+}
 
         .dots {
           display: flex;
