@@ -1,101 +1,57 @@
-# 🚀 Velosite – AI Website Builder  
+# Velosite
 
-Velosite is an **AI-powered website builder** that converts natural language prompts into fully functional frontend code.
+Velosite is an AI-assisted website builder that generates webpage code from prompts and now supports GitHub integration from the UI.
 
-> 💡 “Describe your idea. Get a working website.”
+## Features
 
----
+- Prompt-based website generation.
+- Live preview and raw code view.
+- Project history in sidebar.
+- **GitHub OAuth connect flow**.
+- **Create repository** from the app.
+- **Push generated `index.html` and a `README.md`** to your GitHub repository.
 
-⭐ Support
+## Requirements
 
-If you like this project, consider giving it a ⭐ on GitHub!
+- Node.js 20.9+ (recommended for Next.js 16)
+- npm
 
-## ✨ Features  
+## Environment Variables
 
-- 🧠 AI-based code generation  
-- ⚡ FastAPI backend with streaming output  
-- 🎨 Clean, modern UI  
-- 🔁 Live preview of generated website  
-- 📂 Structured code output (HTML, CSS, JS / React)  
-- 🤖 Multi-agent system (Planner → Builder → Reviewer)  
-
----
-
-## 🛠️ Tech Stack  
-
-**Frontend**  
-- React / Next.js  
-- Tailwind CSS  
-
-**Backend**  
-- FastAPI  
-- Python  
-
-**AI System**  
-- CrewAI (multi-agent architecture)  
-- LLM-based structured generation  
-
-## 📁 Project Structure
-
-```
-velosite/
-│
-├── backend/               # Core server & AI logic
-│   ├── main.py            # FastAPI entrypoint
-│   ├── agents/            # Agentic AI modules
-│   └── utils/             # Shared helpers & tools
-│
-├── frontend/              # UI layer
-│   ├── components/        # Reusable UI components
-│   ├── pages/             # Route-level page files
-│   └── styles/            # Global & module CSS
-│
-├── .env                   # Environment variables (never commit!)
-└── README.md              # You are here
-```
-
-### Backend
-- `main.py` — App init, routes, and middleware
-- `agents/` — Autonomous AI agents (planning, execution, memory)
-- `utils/` — API wrappers, parsers, and shared logic
-
-### Frontend
-- `components/` — Buttons, cards, modals, and other atoms
-- `pages/` — Full-page views mapped to routes
-- `styles/` — Theme variables, resets, and utility classes
-
-## ⚙️ Installation & Setup  
-
-### 1. Clone Repository  
+Create a `.env.local` file:
 
 ```bash
-git clone https://github.com/your-username/Velosite.git
-cd velosite
+GITHUB_CLIENT_ID=your_github_oauth_app_client_id
+GITHUB_CLIENT_SECRET=your_github_oauth_app_client_secret
+```
 
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload
+> In your GitHub OAuth App settings, set the callback URL to:
+>
+> `http://localhost:3000/api/github/callback`
 
-cd frontend
+## Run locally
+
+```bash
 npm install
 npm run dev
 ```
 
-Create a modern landing page for an AI startup with pricing section
+Open `http://localhost:3000`.
 
-Velosite will:
-Generate structured plan
-Build frontend code
-Show live preview
-🧠 How It Works
+## GitHub flow in the app
 
-Velosite uses a multi-agent pipeline:
+1. Click **Connect with GitHub**.
+2. Authorize repository access.
+3. Enter a repository name.
+4. Click **Create Repo**.
+5. Generate website code, then click **Push to GitHub**.
 
-🧩 Planner Agent → Converts prompt into structured JSON
-🏗️ Builder Agent → Generates code files
-🔍 Reviewer Agent → Improves and fixes output
-📌 Future Improvements
-🔐 GitHub integration (auto push generated code)
-🌐 Full-stack generation (backend + database)
-🧩 Component-level editing
-📦 Export as deployable project
+The app commits:
+
+- `README.md`
+- `index.html`
+
+## Notes
+
+- GitHub access token is stored in an HTTP-only cookie.
+- If token expires or is revoked, reconnect via the same button.

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import './globals.css'
 import './page.css'
 
@@ -69,20 +70,44 @@ export default function Home() {
   const [editingName, setEditingName] = useState("");
   const [projectCounter, setProjectCounter] = useState(1);
   const [refreshTime, setRefreshTime] = useState(0);
+  const [nowMillis, setNowMillis] = useState(0);
   const [changeRequest, setChangeRequest] = useState("");
+  const [githubUser, setGithubUser] = useState<{
+    login: string;
+    avatar_url: string;
+    html_url: string;
+  } | null>(null);
+  const [repoName, setRepoName] = useState("");
+  const [githubStatus, setGithubStatus] = useState("");
+  const [isGithubBusy, setIsGithubBusy] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Recalculate time display every second
   useEffect(() => {
     const interval = setInterval(() => {
       setRefreshTime(prev => prev + 1);
+      setNowMillis(Date.now());
     }, 1000);
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const loadGithubUser = async () => {
+      try {
+        const response = await fetch("/api/github/user", { cache: "no-store" });
+        const data = await response.json();
+        setGithubUser(data.authenticated ? data.user : null);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadGithubUser();
+  }, []);
+
   const getRelativeTime = (timestamp: number): string => {
-    const now = Date.now();
-    const seconds = Math.floor((now - timestamp) / 1000);
+    if (!nowMillis) return "Just now";
+    const seconds = Math.floor((nowMillis - timestamp) / 1000);
 
     if (seconds < 60) return "Just now";
     const minutes = Math.floor(seconds / 60);
@@ -162,6 +187,83 @@ export default function Home() {
 
   const deleteProject = (id: number) => {
     setRecentProjects(recentProjects.filter(p => p.id !== id));
+  };
+
+  const connectWithGithub = () => {
+    window.location.href = "/api/github/login";
+  };
+
+  const disconnectGithub = async () => {
+    setIsGithubBusy(true);
+    try {
+      await fetch("/api/github/logout", { method: "POST" });
+      setGithubUser(null);
+      setGithubStatus("Disconnected from GitHub.");
+    } catch (error) {
+      console.error(error);
+      setGithubStatus("Unable to disconnect from GitHub.");
+    }
+    setIsGithubBusy(false);
+  };
+
+  const createGithubRepo = async () => {
+    if (!repoName) {
+      setGithubStatus("Please enter a repository name first.");
+      return;
+    }
+
+    setIsGithubBusy(true);
+    setGithubStatus("Creating repository...");
+    try {
+      const response = await fetch("/api/github/repos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: repoName }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create repository.");
+      }
+
+      setGithubStatus(`Repository created: ${data.repo.full_name}`);
+    } catch (error) {
+      console.error(error);
+      setGithubStatus(error instanceof Error ? error.message : "Failed to create repository.");
+    }
+    setIsGithubBusy(false);
+  };
+
+  const pushToGithub = async () => {
+    if (!repoName || !code) {
+      setGithubStatus("Generate code and set a repository name before pushing.");
+      return;
+    }
+
+    setIsGithubBusy(true);
+    setGithubStatus("Pushing README.md and index.html to GitHub...");
+    try {
+      const response = await fetch("/api/github/push", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          repo: repoName,
+          code,
+          projectName: repoName,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Push failed.");
+      }
+
+      setGithubStatus(`Pushed successfully: ${data.repoUrl}`);
+    } catch (error) {
+      console.error(error);
+      setGithubStatus(error instanceof Error ? error.message : "Failed to push code.");
+    }
+    setIsGithubBusy(false);
   };
 
   return (
@@ -292,6 +394,66 @@ export default function Home() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div className="github-panel">
+              <div className="section-label">GitHub</div>
+
+              {!githubUser ? (
+                <button className="github-btn" onClick={connectWithGithub}>
+                  Connect with GitHub
+                </button>
+              ) : (
+                <>
+                  <div className="github-user-row">
+                    <Image
+                      src={githubUser.avatar_url}
+                      alt={githubUser.login}
+                      className="github-avatar"
+                      width={24}
+                      height={24}
+                    />
+                    <div className="github-user-meta">
+                      <span>@{githubUser.login}</span>
+                      <a href={githubUser.html_url} target="_blank" rel="noreferrer">
+                        View profile
+                      </a>
+                    </div>
+                    <button
+                      className="github-link-btn"
+                      onClick={disconnectGithub}
+                      disabled={isGithubBusy}
+                    >
+                      Disconnect
+                    </button>
+                  </div>
+
+                  <input
+                    className="github-input"
+                    placeholder="Repository name (e.g. velosite-site)"
+                    value={repoName}
+                    onChange={(e) => setRepoName(e.target.value)}
+                  />
+                  <div className="github-actions">
+                    <button
+                      className="github-link-btn"
+                      onClick={createGithubRepo}
+                      disabled={isGithubBusy || !repoName}
+                    >
+                      Create Repo
+                    </button>
+                    <button
+                      className="github-link-btn"
+                      onClick={pushToGithub}
+                      disabled={isGithubBusy || !repoName || !code}
+                    >
+                      Push to GitHub
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {githubStatus && <div className="github-status">{githubStatus}</div>}
             </div>
           </div>
 
